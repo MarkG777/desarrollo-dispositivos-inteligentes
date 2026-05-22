@@ -24,22 +24,6 @@ El codigo esta en `climate_app/lib/main.dart` y esta comentado para entender cad
 - `MyHomePage` - Pantalla principal con Scaffold (AppBar + body).
 - Dentro del body se usan: Center, Column, Text, SizedBox e Icon.
 
-## Uso de IA en esta practica
-
-Se utilizo una herramienta de IA conversacional como apoyo en:
-
-1. Creacion del proyecto Flutter (`flutter create climate_app`).
-2. Escritura del codigo inicial de `main.dart` basado en la guia del curso.
-3. Correccion de un error de codificacion (encoding UTF-8) que provoco que los simbolos especiales no se vieran bien en el navegador.
-4. Agregado de comentarios explicativos en el codigo para entender los widgets.
-5. Comandos de Git para subir el proyecto al repositorio.
-
-## Lo que se hizo manualmente
-
-- Revision visual de la app en Chrome para verificar que se ve correctamente.
-- Modificaciones solicitadas por la guia: cambio de color a rojo, tamano de fuente a 96, cambio de icono a sol.
-- Ajustes menores de texto y verificacion del resultado final.
-
 ## Como ejecutar
 
 1. Abrir terminal en la carpeta `climate_app`.
