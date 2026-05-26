@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>P1.1 - Tablas</title>
+  <link rel="stylesheet" href="tablas.css" />
+</head>
+<body>
+  <div class="page">
+    <h1>P1.1 — Tablas de la práctica</h1>
+    <p class="subtitle">Marco Antonio Gómez Olvera</p>
+
+    <section class="block">
+      <h2>Tabla comparativa de pantallas</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Dispositivo</th>
+            <th>Modelo / referencia</th>
+            <th>Tipo de pantalla</th>
+            <th>Tamaño (pulg)</th>
+            <th>Resolución (px)</th>
+            <th>Relación de aspecto</th>
+            <th>Densidad aprox. (ppi)</th>
+            <th>SO principal</th>
+            <th>Limitaciones de diseño relevantes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Teléfono</td>
+            <td>Android "Medium Phone" (emulador)</td>
+            <td>OLED/AMOLED rectangular</td>
+            <td>6.4"</td>
+            <td>1080 × 2400</td>
+            <td>~20:9</td>
+            <td>~411</td>
+            <td>Android 16 (emulador)</td>
+            <td>Espacio vertical limitado cuando aparece teclado; notch/cámara frontal puede tapar la barra superior.</td>
+          </tr>
+          <tr>
+            <td>Reloj</td>
+            <td>Wear OS Large Round (emulador)</td>
+            <td>OLED circular</td>
+            <td>1.3"</td>
+            <td>416 × 416</td>
+            <td>1:1 (circular)</td>
+            <td>~329</td>
+            <td>Wear OS (Android 16)</td>
+            <td>Muy poco espacio para texto, gestos con el dedo tapan gran parte de la pantalla.</td>
+          </tr>
+          <tr>
+            <td>Smart TV</td>
+            <td>Smart TV 55" 4K (genérica)</td>
+            <td>LCD/LED 16:9</td>
+            <td>55"</td>
+            <td>3840 × 2160</td>
+            <td>16:9</td>
+            <td>~80</td>
+            <td>Android TV / Google TV</td>
+            <td>Se ve a varios metros; texto pequeño es ilegible, navegación lenta con control remoto.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="block">
+      <h2>Clasificación de datos por nivel de riesgo de privacidad</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Tipo de dato</th>
+            <th>Ejemplo concreto</th>
+            <th>Permiso (Android)</th>
+            <th>Dispositivo(s)</th>
+            <th>Nivel de riesgo</th>
+            <th>Comentario rápido</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Ubicación precisa</td>
+            <td>GPS en tiempo real del teléfono</td>
+            <td>ACCESS_FINE_LOCATION</td>
+            <td>Teléfono, reloj</td>
+            <td>Alto</td>
+            <td>Permite saber dónde está el usuario en todo momento.</td>
+          </tr>
+          <tr>
+            <td>Datos de salud / actividad</td>
+            <td>Pasos diarios, ritmo cardíaco</td>
+            <td>BODY_SENSORS / APIs Health</td>
+            <td>Reloj</td>
+            <td>Alto</td>
+            <td>Información muy sensible que revela hábitos y estado físico.</td>
+          </tr>
+          <tr>
+            <td>Cámara y micrófono</td>
+            <td>Grabación de video o audio</td>
+            <td>CAMERA, RECORD_AUDIO</td>
+            <td>Teléfono, Smart TV</td>
+            <td>Alto</td>
+            <td>Pueden capturar lo que pasa alrededor sin que el usuario note.</td>
+          </tr>
+          <tr>
+            <td>Contactos</td>
+            <td>Lista de contactos, correos</td>
+            <td>READ_CONTACTS</td>
+            <td>Teléfono</td>
+            <td>Medio–alto</td>
+            <td>Permite mapear la red social del usuario.</td>
+          </tr>
+          <tr>
+            <td>Historial de apps / uso</td>
+            <td>Tiempo de uso, apps instaladas</td>
+            <td>Permisos de uso / Usage Stats</td>
+            <td>Teléfono, Smart TV</td>
+            <td>Medio</td>
+            <td>Útil para analítica, pero puede perfilar intereses y rutinas.</td>
+          </tr>
+          <tr>
+            <td>Identificadores del dispositivo</td>
+            <td>ID de publicidad, modelo, versión de SO</td>
+            <td>Sin permiso o AD_ID</td>
+            <td>Todos</td>
+            <td>Medio</td>
+            <td>Pueden usarse para seguimiento entre apps y plataformas.</td>
+          </tr>
+          <tr>
+            <td>Datos básicos de configuración</td>
+            <td>Idioma, zona horaria, nivel de batería</td>
+            <td>Generalmente sin permiso extra</td>
+            <td>Todos</td>
+            <td>Bajo</td>
+            <td>Se usan para adaptar la interfaz; riesgo bajo si se manejan bien.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+</body>
+</html>
