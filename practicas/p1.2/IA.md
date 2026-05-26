@@ -33,6 +33,9 @@ La IA agrego comentarios explicativos en `lib/main.dart` para entender que hace 
 
 Estos comentarios sirven como referencia rapida para entender los widgets basicos de Flutter usados en esta practica.
 
+### 3. utilización de herramientas para plantillas figma
+Se le solicito ayuda a la ia para comprender como se usabana las herramientas tipo widgets y plugins como spark entre otras así como para la mejora del diseño y sugerencias para un diseño profesional.
+
 ## Lo que se hizo sin IA
 
 - Creacion del proyecto Flutter (`flutter create`).

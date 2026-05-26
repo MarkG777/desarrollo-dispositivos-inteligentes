@@ -12,6 +12,3 @@ https://www.figma.com/design/vFOw9BZK8KrrH8ROtJnlvX/P1.2_App_Clima_Marco_Antonio
 
 ![plantilla3](./plantilla3.png)
 
-Notas:
-- Esta carpeta contiene únicamente las capturas y el enlace a Figma para la revisión.
-- El origen de las plantillas (HTML local) está excluido del repositorio por seguridad (.gitignore).
