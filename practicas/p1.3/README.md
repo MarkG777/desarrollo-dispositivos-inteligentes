@@ -7,13 +7,7 @@
 
 ## Evidencias
 
-### Watchface
-
-![Watchface circular](./images/watchface.png)
-
-### Dashboard TV
-
-![Dashboard TV](./images/tv_dashboard.png)
+![Diseno completo P1.3 - Wearable y TV](./images/final_cap.png)
 
 ## Entregables incluidos
 - Watchface circular 384×384 px (3 elementos visibles).
