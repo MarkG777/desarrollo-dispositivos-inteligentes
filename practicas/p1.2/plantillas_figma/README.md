@@ -6,9 +6,4 @@ https://www.figma.com/design/vFOw9BZK8KrrH8ROtJnlvX/P1.2_App_Clima_Marco_Antonio
 
 ## Evidencias (capturas)
 
-![plantilla1](./plantilla1.png)
-
-![plantilla2](./plantilla2.png)
-
-![plantilla3](./plantilla3.png)
-
+![Diseno completo P1.2](./el_bueno.png)

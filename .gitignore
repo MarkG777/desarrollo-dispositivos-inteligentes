@@ -1,0 +1,13 @@
+# Carpetas locales / automatización Figma (NO subir)
+local_figma_html/
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Editores
+.vscode/
+.idea/
+
+# Otros
+*.log
