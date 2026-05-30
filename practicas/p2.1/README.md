@@ -25,5 +25,10 @@ En el entorno utilizado, la sesion de `flutter run` se inicia desde la terminal 
 
 ## Evidencias
 
-- Capturas de la app en ejecucion (carpeta `images/`).
-- Captura del hot reload aplicado (cambio de titulo del AppBar preservando el estado del contador).
+### App en ejecucion
+
+![App ejecutandose en el emulador](climate_app/images/app_running.png)
+
+### Hot reload aplicado
+
+![Cambio de titulo despues de hot reload](climate_app/images/hot_reload.png)
