@@ -35,6 +35,9 @@ El dashboard adapta su disposicion usando `MediaQuery`:
 
 ![Busqueda](climate_app/images/search.png)
 
+#### Filtrado en accion
+
+![Filtrado](climate_app/images/filtrado.png)
 
 ### Pantalla 3: Detalle
 
