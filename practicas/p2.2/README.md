@@ -25,6 +25,8 @@ El dashboard adapta su disposicion usando `MediaQuery`:
 - Portrait: elementos en columna vertical
 - Landscape: elementos en fila horizontal
 
+![Dashboard en landscape](climate_app/images/horizontal.png)
+
 ## Evidencias
 
 ### Pantalla 1: Dashboard
