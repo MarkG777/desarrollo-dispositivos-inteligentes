@@ -28,12 +28,12 @@ El dashboard adapta su disposicion usando `MediaQuery`:
 ## Evidencias
 
 ### Pantalla 1: Dashboard
-![Busqueda](climate_app/images/dashboard.png)
+![Dashboard](climate_app/images/dashboard.png)
 
 
 ### Pantalla 2: Busqueda
 
-![Dashboard](climate_app/images/search.png)
+![Busqueda](climate_app/images/search.png)
 
 
 ### Pantalla 3: Detalle
