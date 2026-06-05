@@ -12,6 +12,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Proveedor de estado disponible para toda la app y sus rutas
     return ChangeNotifierProvider(
       create: (context) => WeatherProvider(),
       child: MaterialApp(

@@ -2,14 +2,11 @@
 
 Durante la realización de la práctica P2.3 la IA asistió en:
 
-1. **Resolución de errores de emulador**  
-   • Identificación de DLL faltante en Android Emulator.  
-   • Guía paso-a-paso para reinstalar el componente y crear un AVD nuevo.
+1. **Corrección de código**  
+   • Ajustes de sintaxis y estructura según la guía de la práctica.
 
-2. **Migración de P2.2 → P2.3**  
-   • Copia automática del proyecto `climate_app` y creación de la nueva carpeta de práctica.  
+2. **Corrección de ortografía**  
+   • Revisión de mensajes y comentarios en los archivos.
 
-3. **Mejoras de código**  
-   • Implementación del patrón `Provider` para el modelo `Weather`.  
-   • Creación de funciones puras en `weather_utils.dart`.  .
-
+3. **Comentarios explicativos**  
+   • Documentación breve en `main.dart`, `weather_provider.dart`, `home_screen.dart` y otros archivos clave.

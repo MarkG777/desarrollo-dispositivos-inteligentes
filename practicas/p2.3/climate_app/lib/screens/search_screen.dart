@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'detail_screen.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -57,12 +56,8 @@ class _SearchScreenState extends State<SearchScreen> {
                   title: Text(city['name']),
                   subtitle: Text(city['temp']),
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => DetailScreen(city: city['name']),
-                      ),
-                    );
+                    // Devuelve la ciudad seleccionada a la pantalla anterior
+                    Navigator.pop(context, city['name']);
                   },
                 );
               },

@@ -1,3 +1,4 @@
+// Pantalla principal: gestiona estado de carga, errores y toggle de unidad
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/weather.dart';
@@ -5,101 +6,106 @@ import '../providers/weather_provider.dart';
 import '../utils/weather_utils.dart';
 import 'search_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    final isLandscape = width > 600;
+  State<HomeScreen> createState() => _HomeScreenState();
+}
 
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Carga datos al abrir la pantalla
+    Provider.of<WeatherProvider>(context, listen: false)
+        .loadWeather('Santiago');
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Clima Actual'),
         centerTitle: true,
       ),
-      body: Center(
-        child: isLandscape
-            ? Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: _buildContent(context),
-              )
-            : Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: _buildContent(context),
-              ),
+      body: Consumer<WeatherProvider>(
+        builder: (context, weather, _) {
+          // Estado de carga
+          if (weather.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          // Estado de error
+          if (weather.errorMessage != null) {
+            return Center(child: Text('Error: ${weather.errorMessage}'));
+          }
+
+          // Sin datos aún
+          if (weather.weather == null) {
+            return const Center(child: Text('No data'));
+          }
+
+          final w = weather.weather!;
+          // Calcula temperatura según la unidad seleccionada
+          final displayTemp = weather.temperatureUnit == '°C'
+              ? w.temperature
+              : WeatherUtils.celsiusToFahrenheit(w.temperature).toInt();
+
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  '$displayTemp${weather.temperatureUnit}',
+                  style: const TextStyle(
+                      fontSize: 72, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  w.city,
+                  style: const TextStyle(fontSize: 24),
+                ),
+                Icon(
+                  WeatherUtils.getWeatherIcon(w.condition),
+                  size: 120,
+                  color: _getIconColor(w.condition),
+                ),
+                Text('Humedad: ${w.humidity}%'),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () => weather.toggleTemperatureUnit(),
+                  child: const Text('Cambiar unidad'),
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: () async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const SearchScreen()),
+                    );
+                    if (result != null && result is String) {
+                      weather.loadWeather(result);
+                    }
+                  },
+                  child: const Text('Buscar Ciudades'),
+                ),
+                const SizedBox(height: 10),
+                ElevatedButton.icon(
+                  onPressed: () => _simulateWeatherChange(context),
+                  icon: const Icon(Icons.refresh),
+                  label: const Text('Cambiar ciudad / clima'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange,
+                    foregroundColor: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
-  }
-
-  List<Widget> _buildContent(BuildContext context) {
-    return [
-      Consumer<WeatherProvider>(
-        builder: (context, weatherProvider, child) {
-          final weather = weatherProvider.weather;
-          return Text(
-            formatTemperature(weather.temp, weather.unit),
-            style: const TextStyle(
-              fontSize: 72,
-              fontWeight: FontWeight.bold,
-              color: Colors.blue,
-            ),
-          );
-        },
-      ),
-      const SizedBox(height: 16, width: 16),
-      Consumer<WeatherProvider>(
-        builder: (context, weatherProvider, child) {
-          final weather = weatherProvider.weather;
-          return Text(
-            weather.city,
-            style: const TextStyle(
-              fontSize: 24,
-              color: Colors.black87,
-            ),
-          );
-        },
-      ),
-      const SizedBox(height: 16, width: 16),
-      Consumer<WeatherProvider>(
-        builder: (context, weatherProvider, child) {
-          final weather = weatherProvider.weather;
-          return Icon(
-            getWeatherIcon(weather.condition),
-            size: 120,
-            color: _getIconColor(weather.condition),
-          );
-        },
-      ),
-      const SizedBox(height: 16, width: 16),
-      const Text(
-        'Humedad: 65%  |  Viento: 12 km/h',
-        style: TextStyle(
-          fontSize: 16,
-          color: Colors.grey,
-        ),
-      ),
-      const SizedBox(height: 40, width: 40),
-      ElevatedButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const SearchScreen()),
-          );
-        },
-        child: const Text('Buscar Ciudades'),
-      ),
-      const SizedBox(height: 16, width: 16),
-      ElevatedButton.icon(
-        onPressed: () => _simulateWeatherChange(context),
-        icon: const Icon(Icons.refresh),
-        label: const Text('Cambiar ciudad / clima'),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.orange,
-          foregroundColor: Colors.white,
-        ),
-      ),
-    ];
   }
 
   Color _getIconColor(String condition) {
@@ -121,31 +127,23 @@ class HomeScreen extends StatelessWidget {
   void _simulateWeatherChange(BuildContext context) {
     final provider = Provider.of<WeatherProvider>(context, listen: false);
     final current = provider.weather;
+    if (current == null) return;
 
     final cities = ['Monterrey', 'Guadalajara', 'Ciudad de Mexico', 'Cancun'];
     final conditions = ['sunny', 'cloudy', 'rainy'];
 
-    final nextCity = cities[cities.indexOf(current.city) + 1 < cities.length
-        ? cities.indexOf(current.city) + 1
-        : 0];
-    final nextCondition = conditions[conditions.indexOf(current.condition) + 1 < conditions.length
-        ? conditions.indexOf(current.condition) + 1
-        : 0];
-    final nextTemp = current.temp == 24.0 ? 32.0 : (current.temp == 32.0 ? 18.0 : 24.0);
+    final nextCity = cities[(cities.indexOf(current.city) + 1) % cities.length];
+    final nextCondition =
+        conditions[(conditions.indexOf(current.condition) + 1) % conditions.length];
+    final nextTemp = current.temperature == 24 ? 32 : (current.temperature == 32 ? 18 : 24);
 
-    try {
-      provider.updateWeather(
-        Weather(
-          city: nextCity,
-          temp: nextTemp,
-          condition: nextCondition,
-          unit: current.unit,
-        ),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
-    }
+    provider.updateWeather(
+      Weather(
+        city: nextCity,
+        temperature: nextTemp,
+        condition: nextCondition,
+        humidity: current.humidity,
+      ),
+    );
   }
 }
