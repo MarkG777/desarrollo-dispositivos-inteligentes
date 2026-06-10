@@ -29,32 +29,6 @@ También entendí la importancia de validar la información antes de mostrarla e
 
 Por otro lado, el manejo de desconexiones y reintentos de conexión fueron clave para que la app no se quede colgada si el wearable se apaga o se aleja. En general, me pareció una práctica muy útil porque muestra cómo conectar apps móviles con dispositivos del mundo real.
 
-## Tabla comparativa: guía vs entregado
-
-| Requisito guía | Estado |
-|---|---|
-| flutter_blue_plus en pubspec.yaml | Entregado |
-| minSdkVersion >= 21 (23+) | Entregado |
-| Permisos BLE en AndroidManifest.xml | Entregado |
-| BLEService con scan, connect, readCharacteristic | Entregado |
-| scanForDevices() devuelve Stream | Entregado |
-| connect(deviceId) conecta al dispositivo | Entregado |
-| discoverServices() para leer características | Entregado |
-| Busca UUID y lee con read() | Entregado |
-| Provider Weather llama BLEService | Entregado |
-| Botón "Buscar dispositivos BLE" en UI | Entregado |
-| Lista de dispositivos encontrados | Entregado |
-| Conexión con estado de carga | Entregado |
-| "Sin conexion BLE" al desconectarse | Entregado |
-| Intentos de reconexión automáticos | Entregado |
-| Validación de datos: rango (-60 a 60), city < 50 | Entregado |
-| No usar setCharacteristicNotification sin validar UUID | Entregado |
-| Bluetooth apagado: mensaje informativo | Entregado |
-| initState sin crash de build | Entregado |
-| Overflow de pantalla corregido | Entregado |
-| Captura del emulador/dispositivo mostrando BLE detectado | Pendiente usuario |
-| Commit en GitHub | Pendiente usuario |
-
 ## Pruebas
 
 ![antecedente](climate_app/images/antecedente.jpeg)
