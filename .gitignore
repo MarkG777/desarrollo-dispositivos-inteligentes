@@ -12,4 +12,7 @@ Thumbs.db
 # Otros
 *.log
 tablas.css
-tablas.html   
+tablas.html
+
+# Archivos de seguimiento local (no subir al repo)
+**/Context.md
