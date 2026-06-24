@@ -91,7 +91,7 @@ Por otro lado, el manejo de errores HTTP fue clave para que la app no crashee cu
 
 > La capa BLE de P2.4 se mantiene integrada. El ícono Bluetooth en el AppBar abre la pantalla de escaneo de dispositivos.
 
-}### Pantalla BLE (herencia P2.4)
+### Pantalla BLE – dispositivos encontrados (herencia P2.4)
 
 <img src="images/encuentra.jpeg" width="280" alt="Pantalla BLE encuentra dispositivos"/>
 
