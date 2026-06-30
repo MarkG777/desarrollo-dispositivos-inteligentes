@@ -14,13 +14,35 @@ class MonitorScreen extends StatelessWidget {
         centerTitle: true,
         actions: [
           Consumer<ActivityProvider>(
-            builder: (ctx, ap, _) => IconButton(
-              icon: Icon(ap.isConnected
-                  ? Icons.bluetooth_connected
-                  : Icons.bluetooth_disabled),
-              color: ap.isConnected ? Colors.blue : Colors.grey,
-              onPressed: () =>
-                  ap.isConnected ? ap.disconnect() : ap.connect(),
+            builder: (ctx, ap, _) => Row(
+              children: [
+                if (ap.isDemoMode)
+                  Container(
+                    margin: const EdgeInsets.symmetric(vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.amber,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Text(
+                      'DEMO',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                IconButton(
+                  icon: Icon(ap.isConnected
+                      ? Icons.bluetooth_connected
+                      : Icons.bluetooth_disabled),
+                  color: ap.isConnected ? Colors.blue : Colors.grey,
+                  onPressed: () =>
+                      ap.isConnected ? ap.disconnect() : ap.connect(),
+                ),
+              ],
             ),
           ),
         ],
@@ -79,6 +101,12 @@ class MonitorScreen extends StatelessWidget {
                     onPressed: ap.connect,
                     icon: const Icon(Icons.bluetooth_searching),
                     label: const Text('Buscar wearable'),
+                  ),
+                  const SizedBox(height: 12),
+                  TextButton.icon(
+                    onPressed: ap.startDemo,
+                    icon: const Icon(Icons.play_circle_outline),
+                    label: const Text('Modo Demo (sin wearable)'),
                   ),
                 ],
               ),

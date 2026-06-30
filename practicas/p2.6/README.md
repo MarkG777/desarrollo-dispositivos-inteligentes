@@ -38,7 +38,9 @@ practicas/p2.6/
 │   ├── wear_data.png         # Wearable caminando (95 bpm, 51 pasos)
 │   ├── phone_disconnected.png # Teléfono — pantalla inicial
 │   ├── phone_scanning.png    # Teléfono escaneando ("Buscando wearable...")
-│   └── phone_error.png       # Teléfono — wearable no encontrado tras 15s
+│   ├── phone_error.png       # Teléfono — wearable no encontrado tras 15s
+│   ├── phone_dashboard.png   # Dashboard 4 métricas en Modo Demo (caminando)
+│   └── phone_alert.png       # Dashboard con alerta bpm > 120 (corriendo)
 ├── wearable_app/             # App Wear OS
 │   └── lib/
 │       ├── ble_constants.dart     # UUIDs de servicio y características
@@ -142,7 +144,19 @@ Al presionar **Buscar wearable**, aparece el spinner con "Buscando wearable..." 
 
 Tras 15 segundos de timeout, aparece el ícono de error rojo con el mensaje **"Wearable no encontrado en 15 segundos"** y botón **Reintentar**. Esto demuestra el manejo correcto de errores en `ActivityProvider`.
 
-> **Nota sobre BLE en emuladores**: El advertising BLE entre dos AVDs Android no está completamente soportado por la plataforma. El wearable corre el simulador y emite NOTIFY internos (visibles en los logs `[BleServer] NOTIFY ...`), pero el escaneo del teléfono no lo encuentra. Para verificar el flujo completo de datos en tiempo real entre ambos dispositivos, se recomienda usar **dispositivos físicos** con Bluetooth LE real.
+### Teléfono — Dashboard en Modo Demo
+
+![Phone Dashboard](captures/phone_dashboard.png)
+
+Para demostrar el **Widget de Monitoreo** sin depender del handshake BLE entre emuladores, la app incluye un **Modo Demo** que genera datos simulados localmente. Se observa el badge **DEMO** amarillo en el AppBar, el estado **CAMINANDO**, y las 4 tarjetas (`MetricCard`) con gradientes mostrando: **13 pasos**, **94 bpm**, **5 kcal** y zona FC **Moderada**. Los datos se actualizan cada segundo vía `ActivityProvider` + `Consumer`.
+
+### Teléfono — Alerta de ritmo cardiaco alto
+
+![Phone Alert](captures/phone_alert.png)
+
+Al pasar a estado **CORRIENDO** (bpm > 120), aparece el **banner rojo de alerta** con `Icons.warning`: *"Ritmo cardiaco alto: 142 bpm"*. La tarjeta de Ritmo Cardiaco cambia de color y la zona FC pasa a **Alta**. Esto cumple el criterio 4 de la práctica (alerta visual cuando `d.heartRate > 120`).
+
+> **Nota sobre BLE en emuladores**: El advertising BLE entre dos AVDs Android no está completamente soportado por la plataforma. El wearable corre el simulador y emite NOTIFY internos (visibles en los logs `[BleServer] NOTIFY ...`), pero el escaneo del teléfono no lo encuentra. Por eso se incluye el **Modo Demo** que reutiliza la misma UI (`MonitorScreen`, `MetricCard`, `ActivityData`, `ActivityProvider`) y demuestra que toda la lógica de presentación funciona. Para verificar el flujo BLE completo en tiempo real, se recomienda usar **dispositivos físicos** con Bluetooth LE real.
 
 ---
 
