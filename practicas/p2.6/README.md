@@ -112,55 +112,55 @@ Presionar **BUSCAR WEARABLE** para escanear y conectar.
 
 <img src="captures/wear_idle.png" width="240" alt="Wearable Idle">
 
-El wearable muestra **72 bpm** en reposo, 0 pasos, 0 kcal, estado "reposo" y botón verde **Iniciar**. Tema oscuro adaptado a la pantalla circular.
+Wearable en reposo: 72 bpm, 0 pasos, botón **Iniciar**.
 
 ### Wearable — Recién iniciado
 
 <img src="captures/wear_active.png" width="240" alt="Wearable Active">
 
-Tras presionar **Iniciar**, el simulador comienza a generar datos cada segundo. El botón cambia a **Detener** (rojo). El bpm empieza a fluctuar (78 bpm). Los pasos aún están en 0 porque el estado inicial es "reposo".
+Wearable activo: botón **Detener** (rojo), 78 bpm, estado reposo.
 
 ### Wearable — Datos en actividad (caminando)
 
 <img src="captures/wear_data.png" width="240" alt="Wearable Data">
 
-Tras ~90 segundos, el simulador cambió aleatoriamente a estado **caminando**: ahora hay **95 bpm**, **51 pasos** y el estado muestra "caminando". El simulador agrega pasos en cada tick y el bpm sube hacia ~95 (objetivo de caminando).
+Wearable caminando: **95 bpm**, **51 pasos**, estado caminando.
 
 ### Teléfono — Pantalla inicial (desconectado)
 
 <img src="captures/phone_disconnected.png" width="280" alt="Phone Disconnected">
 
-Pantalla inicial del teléfono con icono de reloj, mensaje **"Conecta tu wearable"** y botón **Buscar wearable**. AppBar con el icono Bluetooth desactivado.
+Pantalla inicial: **Conecta tu wearable** + botón **Buscar wearable**.
 
 ### Teléfono — Escaneando
 
 <img src="captures/phone_scanning.png" width="280" alt="Phone Scanning">
 
-Al presionar **Buscar wearable**, aparece el spinner con "Buscando wearable..." mientras `BleClient.scanAndConnect()` escanea por `serviceUUID`.
+Escaneando: spinner **Buscando wearable...**.
 
 ### Teléfono — Wearable no encontrado
 
 <img src="captures/phone_error.png" width="280" alt="Phone Error">
 
-Tras 15 segundos de timeout, aparece el ícono de error rojo con el mensaje **"Wearable no encontrado en 15 segundos"** y botón **Reintentar**. Esto demuestra el manejo correcto de errores en `ActivityProvider`.
+Error tras timeout: **Wearable no encontrado en 15 segundos**.
 
 ### Teléfono — Dashboard en Modo Demo (vista previa)
 
 <img src="captures/phone_dashboard.png" width="280" alt="Phone Dashboard">
 
-Vista previa de cómo se vería el **Widget de Monitoreo** cuando el teléfono recibe datos del wearable. Se observa el badge **DEMO** amarillo en el AppBar, el estado **CAMINANDO**, y las 4 tarjetas (`MetricCard`) con gradientes mostrando: **13 pasos**, **94 bpm**, **5 kcal** y zona FC **Moderada**. Los datos se actualizan cada segundo vía `ActivityProvider` + `Consumer`.
+Dashboard en **Modo Demo**: 4 tarjetas con badge DEMO, estado **CAMINANDO**, 94 bpm, zona FC Moderada.
 
-> ⚠️ **Nota: esto es solo una prueba visual.** Como ambos dispositivos son emuladores (Wear OS y Pixel 5) y el advertising BLE no es soportado entre AVDs, **esta pantalla nunca se vería realmente con datos del wearable** en este entorno. Por eso se añadió un botón **"Modo Demo (sin wearable)"** que genera datos localmente con la misma `ActivityProvider`, solo para mostrar que toda la UI y la lógica funcionan correctamente. En dispositivos físicos el dashboard recibiría los mismos datos pero vía BLE NOTIFY.
+> ⚠️ **Nota: solo es prueba visual.** Como el advertising BLE no funciona entre emuladores, el dashboard se muestra con el **Modo Demo** que genera datos locales para verificar que la UI y la lógica funcionan. En dispositivos físicos llegaría vía BLE NOTIFY.
 
 ### Teléfono — Alerta de ritmo cardiaco alto (vista previa)
 
 <img src="captures/phone_alert.png" width="280" alt="Phone Alert">
 
-Al pasar a estado **CORRIENDO** (bpm > 120), aparece el **banner rojo de alerta** con `Icons.warning`: *"Ritmo cardiaco alto: 142 bpm"*. La tarjeta de Ritmo Cardiaco cambia de color y la zona FC pasa a **Alta**. Esto cumple el criterio 4 de la práctica (alerta visual cuando `d.heartRate > 120`).
+Alerta en Modo Demo: banner rojo **Ritmo cardiaco alto: 142 bpm**, zona FC Alta.
 
-> ⚠️ **Nota: esto también es solo una prueba visual** generada por el **Modo Demo** (badge DEMO arriba a la derecha). En condiciones reales esta misma alerta se dispararía cuando el wearable envíe vía BLE un valor de bpm mayor a 120; el componente `if (d.heartRate > 120)` en `MonitorScreen` reacciona idénticamente sin importar el origen de los datos.
+> ⚠️ **Nota: solo es prueba visual del Modo Demo.** En uso real, esta alerta se activa cuando el wearable envíe bpm > 120 vía BLE.
 
-> **Nota sobre BLE en emuladores**: El advertising BLE entre dos AVDs Android no está completamente soportado por la plataforma. El wearable corre el simulador y emite NOTIFY internos (visibles en los logs `[BleServer] NOTIFY ...`), pero el escaneo del teléfono no lo encuentra. Por eso se incluye el **Modo Demo** que reutiliza la misma UI (`MonitorScreen`, `MetricCard`, `ActivityData`, `ActivityProvider`) y demuestra que toda la lógica de presentación funciona. Para verificar el flujo BLE completo en tiempo real, se recomienda usar **dispositivos físicos** con Bluetooth LE real.
+> **Nota sobre BLE en emuladores**: El advertising BLE entre AVDs Android no es soportado. El wearable emite NOTIFY, pero el teléfono no lo encuentra al escanear. El **Modo Demo** permite verificar la UI con datos locales. Para flujo real se recomienda dispositivos físicos.
 
 ---
 
