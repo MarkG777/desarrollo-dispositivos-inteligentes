@@ -28,3 +28,6 @@ Thumbs.db
 # Capturas de prueba (temporales)
 **/test_*.png
 **/sc_*.png
+
+# Instrucciones de la practica (no publicas)
+P2.6_Contexto.md
