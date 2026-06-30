@@ -110,43 +110,43 @@ Presionar **BUSCAR WEARABLE** para escanear y conectar.
 
 ### Wearable — Estado inicial (reposo)
 
-![Wearable Idle](captures/wear_idle.png)
+<img src="captures/wear_idle.png" width="240" alt="Wearable Idle">
 
 El wearable muestra **72 bpm** en reposo, 0 pasos, 0 kcal, estado "reposo" y botón verde **Iniciar**. Tema oscuro adaptado a la pantalla circular.
 
 ### Wearable — Recién iniciado
 
-![Wearable Active](captures/wear_active.png)
+<img src="captures/wear_active.png" width="240" alt="Wearable Active">
 
 Tras presionar **Iniciar**, el simulador comienza a generar datos cada segundo. El botón cambia a **Detener** (rojo). El bpm empieza a fluctuar (78 bpm). Los pasos aún están en 0 porque el estado inicial es "reposo".
 
 ### Wearable — Datos en actividad (caminando)
 
-![Wearable Data](captures/wear_data.png)
+<img src="captures/wear_data.png" width="240" alt="Wearable Data">
 
 Tras ~90 segundos, el simulador cambió aleatoriamente a estado **caminando**: ahora hay **95 bpm**, **51 pasos** y el estado muestra "caminando". El simulador agrega pasos en cada tick y el bpm sube hacia ~95 (objetivo de caminando).
 
 ### Teléfono — Pantalla inicial (desconectado)
 
-![Phone Disconnected](captures/phone_disconnected.png)
+<img src="captures/phone_disconnected.png" width="280" alt="Phone Disconnected">
 
 Pantalla inicial del teléfono con icono de reloj, mensaje **"Conecta tu wearable"** y botón **Buscar wearable**. AppBar con el icono Bluetooth desactivado.
 
 ### Teléfono — Escaneando
 
-![Phone Scanning](captures/phone_scanning.png)
+<img src="captures/phone_scanning.png" width="280" alt="Phone Scanning">
 
 Al presionar **Buscar wearable**, aparece el spinner con "Buscando wearable..." mientras `BleClient.scanAndConnect()` escanea por `serviceUUID`.
 
 ### Teléfono — Wearable no encontrado
 
-![Phone Error](captures/phone_error.png)
+<img src="captures/phone_error.png" width="280" alt="Phone Error">
 
 Tras 15 segundos de timeout, aparece el ícono de error rojo con el mensaje **"Wearable no encontrado en 15 segundos"** y botón **Reintentar**. Esto demuestra el manejo correcto de errores en `ActivityProvider`.
 
 ### Teléfono — Dashboard en Modo Demo (vista previa)
 
-![Phone Dashboard](captures/phone_dashboard.png)
+<img src="captures/phone_dashboard.png" width="280" alt="Phone Dashboard">
 
 Vista previa de cómo se vería el **Widget de Monitoreo** cuando el teléfono recibe datos del wearable. Se observa el badge **DEMO** amarillo en el AppBar, el estado **CAMINANDO**, y las 4 tarjetas (`MetricCard`) con gradientes mostrando: **13 pasos**, **94 bpm**, **5 kcal** y zona FC **Moderada**. Los datos se actualizan cada segundo vía `ActivityProvider` + `Consumer`.
 
@@ -154,7 +154,7 @@ Vista previa de cómo se vería el **Widget de Monitoreo** cuando el teléfono r
 
 ### Teléfono — Alerta de ritmo cardiaco alto (vista previa)
 
-![Phone Alert](captures/phone_alert.png)
+<img src="captures/phone_alert.png" width="280" alt="Phone Alert">
 
 Al pasar a estado **CORRIENDO** (bpm > 120), aparece el **banner rojo de alerta** con `Icons.warning`: *"Ritmo cardiaco alto: 142 bpm"*. La tarjeta de Ritmo Cardiaco cambia de color y la zona FC pasa a **Alta**. Esto cumple el criterio 4 de la práctica (alerta visual cuando `d.heartRate > 120`).
 
