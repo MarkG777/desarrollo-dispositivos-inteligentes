@@ -46,6 +46,19 @@ class BleServer {
         print('[BleServer] $deviceId connected=$connected');
       });
 
+      BlePeripheral.setCharacteristicSubscriptionChangeCallback((
+        deviceId,
+        characteristicId,
+        subscribed,
+      ) {
+        print('[BleServer] $deviceId subscription $characteristicId=$subscribed');
+      });
+
+      BlePeripheral.setReadRequestCallback((characteristicId, offset, value) {
+        print('[BleServer] ReadRequest $characteristicId');
+        return value;
+      });
+
       _initialized = true;
     } catch (e) {
       _error = 'init: $e';

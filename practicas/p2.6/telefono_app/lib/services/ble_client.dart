@@ -96,8 +96,8 @@ class BleClient {
           print('[BleClient] NOTIFY activado: $uuid');
         }
 
-        // Suscribirse al stream de valores
-        final sub = char.lastValueStream.listen((bytes) {
+        // Suscribirse al stream de notificaciones
+        final sub = char.onValueReceived.listen((bytes) {
           _handleValue(uuid, bytes);
         });
         _subs.add(sub);
@@ -106,22 +106,34 @@ class BleClient {
   }
 
   void _handleValue(String uuid, List<int> bytes) {
-    if (bytes.isEmpty) return;
+    if (bytes.isEmpty) {
+      print('[BleClient] Valor vacio para $uuid');
+      return;
+    }
+    print('[BleClient] RECIBIDO $uuid: $bytes');
     try {
       if (uuid == BleConstants.stepsUUID.toLowerCase()) {
         // 4 bytes little-endian -> int
         final bd = ByteData.sublistView(Uint8List.fromList(bytes));
-        _current = _current.copyWith(steps: bd.getInt32(0, Endian.little));
+        final steps = bd.getInt32(0, Endian.little);
+        print('[BleClient] pasos=$steps');
+        _current = _current.copyWith(steps: steps);
       } else if (uuid == BleConstants.heartRateUUID.toLowerCase()) {
         // 1 byte -> int
-        _current = _current.copyWith(heartRate: bytes[0]);
+        final hr = bytes[0];
+        print('[BleClient] bpm=$hr');
+        _current = _current.copyWith(heartRate: hr);
       } else if (uuid == BleConstants.caloriesUUID.toLowerCase()) {
         // 2 bytes little-endian -> int
         final bd = ByteData.sublistView(Uint8List.fromList(bytes));
-        _current = _current.copyWith(calories: bd.getInt16(0, Endian.little));
+        final cal = bd.getInt16(0, Endian.little);
+        print('[BleClient] cal=$cal');
+        _current = _current.copyWith(calories: cal);
       } else if (uuid == BleConstants.statusUUID.toLowerCase()) {
         // bytes -> UTF-8 string
-        _current = _current.copyWith(status: utf8.decode(bytes));
+        final status = utf8.decode(bytes);
+        print('[BleClient] status=$status');
+        _current = _current.copyWith(status: status);
       }
       _dataCtrl.add(_current);
     } catch (e) {

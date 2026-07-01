@@ -121,7 +121,7 @@ Presionar **BUSCAR WEARABLE**. El teléfono escanea el serviceUUID, se conecta a
 
 <img src="captures/p2.6_both_devices.png" width="600" alt="Ambos emuladores conectados por BLE">
 
-Captura compuesta: **Wear OS** (izquierda) anuncia como periférico BLE con `ble_peripheral` y **Medium Phone API 36.1** (derecha) recibe los mismos datos como central BLE con `flutter_blue_plus`. El flujo `Wearable → Teléfono` funciona completamente en emuladores gracias al controlador virtual Netsim.
+Captura compuesta: **Wear OS** (izquierda) anuncia como periférico BLE con `ble_peripheral` y **Pixel 5 API 33** (derecha) recibe los mismos datos como central BLE con `flutter_blue_plus`. El flujo completo `Wearable → Teléfono` funciona en emuladores gracias a Netsim (`-packet-streamer-endpoint default`).
 
 ---
 
@@ -165,7 +165,7 @@ Error tras timeout: **Wearable no encontrado en 15 segundos**.
 
 <img src="captures/phone_dashboard.png" width="280" alt="Phone Dashboard">
 
-Dashboard **real con BLE**: 4 tarjetas con estado **CAMINANDO**, 94 bpm, zona FC Moderada. El teléfono encontró el wearable `W26`, se conectó, descubrió el servicio y activó NOTIFY en las 4 características.
+Dashboard **real con BLE**: 4 tarjetas sincronizadas con el wearable. Los datos llegan vía NOTIFY cada segundo: pasos, bpm, calorías y estado de actividad.
 
 > ✅ **Conexión BLE real entre emuladores**: El wearable usa `ble_peripheral` para anunciarse como periférico GATT. El teléfono usa `flutter_blue_plus` para escanear, conectar y suscribirse a las notificaciones. El flujo completo `Wearable → Teléfono` funciona en los AVDs.
 
@@ -173,7 +173,7 @@ Dashboard **real con BLE**: 4 tarjetas con estado **CAMINANDO**, 94 bpm, zona FC
 
 <img src="captures/phone_alert.png" width="280" alt="Phone Alert">
 
-Alerta: banner rojo **Ritmo cardiaco alto: 142 bpm**, zona FC Alta. El componente `if (d.heartRate > 120)` en `MonitorScreen` se activa tanto con datos BLE reales como con el Modo Demo.
+Alerta **real con BLE**: cuando el wearable envía bpm > 120 (estado corriendo), aparece el banner rojo **Ritmo cardiaco alto** y la zona FC pasa a Alta.
 
 > **Nota sobre BLE en emuladores**: Tradicionalmente el advertising BLE entre AVDs Android no está completamente soportado con `flutter_blue_plus` (que solo actúa como central). Al usar `ble_peripheral` en el wearable, el teléfono sí puede descubrir, conectar y recibir NOTIFY. Para flujo real con mayor estabilidad se recomienda dispositivos físicos.
 
