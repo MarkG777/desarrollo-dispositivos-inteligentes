@@ -19,6 +19,7 @@ class _WearableAppState extends State<WearableApp> {
   int _calories = 0;
   String _status = 'reposo';
   bool _active = false;
+  String _bleStatus = 'BLE detenido';
 
   @override
   void initState() {
@@ -33,21 +34,27 @@ class _WearableAppState extends State<WearableApp> {
     _sim.heartRateStream.listen((v) => setState(() => _heartRate = v));
     _sim.caloriesStream.listen((v) => setState(() => _calories = v));
     _sim.statusStream.listen((v) => setState(() => _status = v));
+    _server.statusStream.listen((v) => setState(() => _bleStatus = v));
   }
 
-  void _toggleActivity() {
+  Future<void> _toggleActivity() async {
     setState(() => _active = !_active);
     if (_active) {
       _sim.start();
-      _server.startAdvertising();
+      try {
+        await _server.startAdvertising();
+      } catch (e) {
+        setState(() => _bleStatus = 'Error BLE');
+      }
     } else {
-      _server.stop();
+      await _server.stop();
     }
   }
 
   @override
   void dispose() {
     _server.stop();
+    _server.dispose();
     super.dispose();
   }
 
@@ -95,6 +102,17 @@ class _WearableAppState extends State<WearableApp> {
                 ),
                 child: Text(_active ? 'Detener' : 'Iniciar',
                     style: const TextStyle(fontSize: 13)),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                _bleStatus,
+                style: TextStyle(
+                  fontSize: 9,
+                  color: _bleStatus.startsWith('Anunciando')
+                      ? Colors.cyanAccent
+                      : Colors.grey,
+                ),
+                textAlign: TextAlign.center,
               ),
             ],
           ),

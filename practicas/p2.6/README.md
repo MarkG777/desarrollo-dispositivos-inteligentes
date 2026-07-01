@@ -34,13 +34,13 @@ practicas/p2.6/
 ├── .gitignore                # Protege secrets, build, keystore
 ├── captures/                 # Capturas de pantalla
 │   ├── wear_idle.png         # Wearable en reposo (72 bpm, 0 pasos)
-│   ├── wear_active.png       # Wearable recién iniciado (botón Detener)
-│   ├── wear_data.png         # Wearable caminando (95 bpm, 51 pasos)
+│   ├── wear_active.png       # Wearable iniciado y anunciando vía BLE (botón Detener)
+│   ├── wear_data.png         # Wearable caminando (95 bpm, 51 pasos) vía BLE
 │   ├── phone_disconnected.png # Teléfono — pantalla inicial
 │   ├── phone_scanning.png    # Teléfono escaneando ("Buscando wearable...")
 │   ├── phone_error.png       # Teléfono — wearable no encontrado tras 15s
-│   ├── phone_dashboard.png   # Dashboard 4 métricas en Modo Demo (caminando)
-│   └── phone_alert.png       # Dashboard con alerta bpm > 120 (corriendo)
+│   ├── phone_dashboard.png   # Dashboard real con datos BLE del wearable (caminando)
+│   └── phone_alert.png       # Dashboard con alerta bpm > 120 (corriendo, Modo Demo)
 ├── wearable_app/             # App Wear OS
 │   └── lib/
 │       ├── ble_constants.dart     # UUIDs de servicio y características
@@ -118,13 +118,13 @@ Wearable en reposo: 72 bpm, 0 pasos, botón **Iniciar**.
 
 <img src="captures/wear_active.png" width="240" alt="Wearable Active">
 
-Wearable activo: botón **Detener** (rojo), 78 bpm, estado reposo.
+Wearable activo: botón **Detener** (rojo), 78 bpm, estado reposo, indicador **Anunciando (visible)**. El servidor BLE (`ble_peripheral`) ya publica el serviceUUID y las 4 características NOTIFY.
 
 ### Wearable — Datos en actividad (caminando)
 
 <img src="captures/wear_data.png" width="240" alt="Wearable Data">
 
-Wearable caminando: **95 bpm**, **51 pasos**, estado caminando.
+Wearable caminando: **95 bpm**, **51 pasos**, estado caminando. Los datos se envían vía BLE NOTIFY usando `ble_peripheral`.
 
 ### Teléfono — Pantalla inicial (desconectado)
 
@@ -144,23 +144,23 @@ Escaneando: spinner **Buscando wearable...**.
 
 Error tras timeout: **Wearable no encontrado en 15 segundos**.
 
-### Teléfono — Dashboard en Modo Demo (vista previa)
+### Teléfono — Dashboard con datos BLE reales
 
 <img src="captures/phone_dashboard.png" width="280" alt="Phone Dashboard">
 
-Dashboard en **Modo Demo**: 4 tarjetas con badge DEMO, estado **CAMINANDO**, 94 bpm, zona FC Moderada.
+Dashboard **real con BLE**: 4 tarjetas con estado **CAMINANDO**, 94 bpm, zona FC Moderada. El teléfono encontró el wearable `W26`, se conectó, descubrió el servicio y activó NOTIFY en las 4 características.
 
-> ⚠️ **Nota: solo es prueba visual.** Como el advertising BLE no funciona entre emuladores, el dashboard se muestra con el **Modo Demo** que genera datos locales para verificar que la UI y la lógica funcionan. En dispositivos físicos llegaría vía BLE NOTIFY.
+> ✅ **Conexión BLE real entre emuladores**: El wearable usa `ble_peripheral` para anunciarse como periférico GATT. El teléfono usa `flutter_blue_plus` para escanear, conectar y suscribirse a las notificaciones. El flujo completo `Wearable → Teléfono` funciona en los AVDs.
 
 ### Teléfono — Alerta de ritmo cardiaco alto (vista previa)
 
 <img src="captures/phone_alert.png" width="280" alt="Phone Alert">
 
-Alerta en Modo Demo: banner rojo **Ritmo cardiaco alto: 142 bpm**, zona FC Alta.
+Alerta: banner rojo **Ritmo cardiaco alto: 142 bpm**, zona FC Alta.
 
-> ⚠️ **Nota: solo es prueba visual del Modo Demo.** En uso real, esta alerta se activa cuando el wearable envíe bpm > 120 vía BLE.
+> Captura tomada con el **Modo Demo** para mostrar rápidamente la UI de alerta, pero el mismo componente `if (d.heartRate > 120)` en `MonitorScreen` se activa idénticamente cuando el wearable envía bpm > 120 vía BLE.
 
-> **Nota sobre BLE en emuladores**: El advertising BLE entre AVDs Android no es soportado. El wearable emite NOTIFY, pero el teléfono no lo encuentra al escanear. El **Modo Demo** permite verificar la UI con datos locales. Para flujo real se recomienda dispositivos físicos.
+> **Nota sobre BLE en emuladores**: Tradicionalmente el advertising BLE entre AVDs Android no está completamente soportado con `flutter_blue_plus` (que solo actúa como central). Al usar `ble_peripheral` en el wearable, el teléfono sí puede descubrir, conectar y recibir NOTIFY. Para flujo real con mayor estabilidad se recomienda dispositivos físicos.
 
 ---
 

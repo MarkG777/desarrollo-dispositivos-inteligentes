@@ -1,76 +1,163 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
-import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:ble_peripheral/ble_peripheral.dart';
 import 'ble_constants.dart';
 import 'sensor_simulator.dart';
 
+/// Servidor BLE real usando ble_peripheral (GATT server + advertising).
+/// El wearable se anuncia como periferico BLE con serviceUUID y 4
+/// caracteristicas NOTIFY. El telefono lo escanea con flutter_blue_plus.
 class BleServer {
   final SensorSimulator simulator;
   bool _advertising = false;
+  bool _initialized = false;
+  String? _error;
+
+  final _statusCtrl = StreamController<String>.broadcast();
+  Stream<String> get statusStream => _statusCtrl.stream;
+
+  bool get isAdvertising => _advertising;
+  String? get error => _error;
+
+  final List<StreamSubscription> _subs = [];
 
   BleServer(this.simulator);
 
-  bool get isAdvertising => _advertising;
+  Future<void> _initOnce() async {
+    if (_initialized) return;
+    try {
+      await BlePeripheral.initialize();
 
-  // Convertir int a bytes little-endian (4 bytes)
+      BlePeripheral.setAdvertisingStatusUpdateCallback((advertising, error) {
+        _advertising = advertising;
+        _error = error;
+        _statusCtrl.add(advertising
+            ? 'Anunciando (visible)'
+            : (error ?? 'Detenido'));
+        print('[BleServer] AdvertisingStatus=$advertising error=$error');
+      });
+
+      BlePeripheral.setBleStateChangeCallback((state) {
+        print('[BleServer] BleState=$state');
+      });
+
+      BlePeripheral.setConnectionStateChangeCallback((deviceId, connected) {
+        print('[BleServer] $deviceId connected=$connected');
+      });
+
+      _initialized = true;
+    } catch (e) {
+      _error = 'init: $e';
+      _statusCtrl.add('Error: $e');
+      print('[BleServer] init error: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> _addService() async {
+    // Cada caracteristica: NOTIFY + READ, permiso readable.
+    BleCharacteristic char(String uuid) => BleCharacteristic(
+          uuid: uuid,
+          properties: [
+            CharacteristicProperties.read.index,
+            CharacteristicProperties.notify.index,
+          ],
+          value: null,
+          permissions: [AttributePermissions.readable.index],
+        );
+
+    await BlePeripheral.addService(
+      BleService(
+        uuid: BleConstants.serviceUUID,
+        primary: true,
+        characteristics: [
+          char(BleConstants.stepsUUID),
+          char(BleConstants.heartRateUUID),
+          char(BleConstants.caloriesUUID),
+          char(BleConstants.statusUUID),
+        ],
+      ),
+    );
+    print('[BleServer] Servicio agregado: ${BleConstants.serviceUUID}');
+  }
+
   Uint8List _intToBytes(int value) {
     final data = ByteData(4);
     data.setInt32(0, value, Endian.little);
     return data.buffer.asUint8List();
   }
 
-  // Convertir int a bytes (2 bytes)
   Uint8List _int16ToBytes(int value) {
     final data = ByteData(2);
     data.setInt16(0, value, Endian.little);
     return data.buffer.asUint8List();
   }
 
-  // Iniciar advertising y GATT server
   Future<void> startAdvertising() async {
     try {
-      // Verificar que BLE esta encendido
-      final state = await FlutterBluePlus.adapterState.first;
-      if (state != BluetoothAdapterState.on) {
-        throw Exception('Bluetooth desactivado. Activalo en el emulador.');
-      }
+      await _initOnce();
+      await _addService();
 
-      _advertising = true;
-      print('[BleServer] Iniciado. Esperando conexiones...');
+      // Suscribir streams del simulador para emitir NOTIFY reales
+      _subs.add(simulator.stepsStream.listen((steps) {
+        _notify(BleConstants.stepsUUID, _intToBytes(steps));
+      }));
+      _subs.add(simulator.heartRateStream.listen((bpm) {
+        _notify(BleConstants.heartRateUUID, Uint8List.fromList([bpm & 0xFF]));
+      }));
+      _subs.add(simulator.caloriesStream.listen((cal) {
+        _notify(BleConstants.caloriesUUID, _int16ToBytes(cal));
+      }));
+      _subs.add(simulator.statusStream.listen((status) {
+        _notify(BleConstants.statusUUID,
+            Uint8List.fromList(utf8.encode(status)));
+      }));
 
-      // Suscribir streams del simulador y notificar cambios
-      simulator.stepsStream.listen((steps) {
-        _notifyCharacteristic(BleConstants.stepsUUID, _intToBytes(steps));
-      });
-      simulator.heartRateStream.listen((bpm) {
-        _notifyCharacteristic(
-            BleConstants.heartRateUUID, Uint8List.fromList([bpm]));
-      });
-      simulator.caloriesStream.listen((cal) {
-        _notifyCharacteristic(BleConstants.caloriesUUID, _int16ToBytes(cal));
-      });
-      simulator.statusStream.listen((status) {
-        _notifyCharacteristic(
-          BleConstants.statusUUID,
-          Uint8List.fromList(utf8.encode(status)),
-        );
-      });
+      // localName corto para caber en 31 bytes junto al UUID 128-bit
+      await BlePeripheral.startAdvertising(
+        services: [BleConstants.serviceUUID],
+        localName: 'W26',
+      );
+      _statusCtrl.add('Anunciando (visible)');
+      print('[BleServer] Advertising iniciado');
     } catch (e) {
-      _advertising = false;
-      print('[BleServer] Error: $e');
+      _error = '$e';
+      _statusCtrl.add('Error: $e');
+      print('[BleServer] startAdvertising error: $e');
       rethrow;
     }
   }
 
-  void _notifyCharacteristic(String uuid, Uint8List data) {
-    // En un servidor GATT real, aqui se enviaria la notificacion.
-    // Para el emulador, los datos se exponen via el mecanismo de
-    // suscripcion que el telefono usa en BleClient.
-    print('[BleServer] NOTIFY $uuid: $data');
+  void _notify(String uuid, Uint8List value) {
+    try {
+      BlePeripheral.updateCharacteristic(
+        characteristicId: uuid,
+        value: value,
+      );
+    } catch (e) {
+      print('[BleServer] updateCharacteristic $uuid error: $e');
+    }
   }
 
-  void stop() {
-    _advertising = false;
+  Future<void> stop() async {
+    for (final s in _subs) {
+      await s.cancel();
+    }
+    _subs.clear();
+    try {
+      if (_initialized) {
+        await BlePeripheral.stopAdvertising();
+      }
+    } catch (e) {
+      print('[BleServer] stopAdvertising error: $e');
+    }
     simulator.stop();
+    _advertising = false;
+    _statusCtrl.add('Detenido');
+  }
+
+  void dispose() {
+    _statusCtrl.close();
   }
 }
