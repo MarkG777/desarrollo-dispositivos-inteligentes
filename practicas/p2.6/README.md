@@ -41,7 +41,7 @@ practicas/p2.6/
 │   ├── phone_error.png       # Teléfono — wearable no encontrado tras 15s
 │   ├── phone_dashboard.png   # Dashboard real con datos BLE del wearable (caminando)
 │   ├── phone_alert.png       # Dashboard con alerta bpm > 120 (corriendo)
-│   └── p2.6_both_devices.png # Ambos emuladores conectados mostrando los mismos datos
+│   └── phone_bueno_chido.png # Evidencia final de conexión BLE real con hora visible
 ├── wearable_app/             # App Wear OS
 │   └── lib/
 │       ├── ble_constants.dart     # UUIDs de servicio y características
@@ -64,9 +64,10 @@ practicas/p2.6/
 ## Requisitos
 
 - Flutter SDK ^3.12.0
-- Android Studio con emuladores **del mismo nivel de API** (recomendado para BLE entre AVDs):
+- Android Studio con emuladores (recomendado mismo nivel de API para BLE entre AVDs):
   - **Wear OS Large Round** (API 36) — para el wearable
   - **Medium Phone API 36.1** (o similar) — para el teléfono
+  - También funciona: **Pixel 5 API 33** (usado en las capturas de evidencia)
 - Dependencias: `flutter_blue_plus`, `provider`, `ble_peripheral`
 
 ---
@@ -81,8 +82,9 @@ Para que los dos AVDs se vean entre sí por Bluetooth, deben lanzarse con el con
 # Lanzar wearable
 emulator -avd Wear_OS_Large_Round -packet-streamer-endpoint default -no-snapshot-load
 
-# Lanzar teléfono (misma API que el wearable para mejor compatibilidad)
+# Lanzar teléfono (Medium Phone API 36.1 o Pixel 5 API 33)
 emulator -avd Medium_Phone_API_36.1 -packet-streamer-endpoint default -no-snapshot-load
+# emulator -avd Pixel_5_API_33 -packet-streamer-endpoint default -no-snapshot-load
 ```
 
 > También puedes emparejarlos desde Android Studio: Device Manager → `Pair Wearable`.
@@ -119,9 +121,9 @@ Presionar **BUSCAR WEARABLE**. El teléfono escanea el serviceUUID, se conecta a
 
 ### Conexión BLE real entre emuladores
 
-<img src="captures/p2.6_both_devices.png" width="600" alt="Ambos emuladores conectados por BLE">
+<img src="captures/phone_bueno_chido.png" width="280" alt="Teléfono conectado al wearable por BLE">
 
-Captura compuesta: **Wear OS** (izquierda) anuncia como periférico BLE con `ble_peripheral` y **Pixel 5 API 33** (derecha) recibe los mismos datos como central BLE con `flutter_blue_plus`. El flujo completo `Wearable → Teléfono` funciona en emuladores gracias a Netsim (`-packet-streamer-endpoint default`).
+Captura del teléfono conectado al wearable `W26` vía BLE. El dashboard muestra datos reales recibidos por NOTIFY: pasos, ritmo cardíaco, calorías y estado de actividad. El flujo completo `Wearable → Teléfono` funciona en emuladores gracias a `ble_peripheral` + Netsim (`-packet-streamer-endpoint default`).
 
 ---
 
