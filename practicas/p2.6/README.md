@@ -40,7 +40,8 @@ practicas/p2.6/
 │   ├── phone_scanning.png    # Teléfono escaneando ("Buscando wearable...")
 │   ├── phone_error.png       # Teléfono — wearable no encontrado tras 15s
 │   ├── phone_dashboard.png   # Dashboard real con datos BLE del wearable (caminando)
-│   └── phone_alert.png       # Dashboard con alerta bpm > 120 (corriendo, Modo Demo)
+│   ├── phone_alert.png       # Dashboard con alerta bpm > 120 (corriendo)
+│   └── p2.6_both_devices.png # Ambos emuladores conectados mostrando los mismos datos
 ├── wearable_app/             # App Wear OS
 │   └── lib/
 │       ├── ble_constants.dart     # UUIDs de servicio y características
@@ -63,24 +64,32 @@ practicas/p2.6/
 ## Requisitos
 
 - Flutter SDK ^3.12.0
-- Android Studio con emuladores:
-  - **Wear OS Large Round** (API 33+) — para el wearable
-  - **Pixel 5 API 33** (o superior) — para el teléfono
-- Dependencias: `flutter_blue_plus`, `provider`
+- Android Studio con emuladores **del mismo nivel de API** (recomendado para BLE entre AVDs):
+  - **Wear OS Large Round** (API 36) — para el wearable
+  - **Medium Phone API 36.1** (o similar) — para el teléfono
+- Dependencias: `flutter_blue_plus`, `provider`, `ble_peripheral`
 
 ---
 
 ## Ejecución
 
-### 1. Iniciar emuladores
+### 1. Iniciar emuladores con BLE virtual (Netsim)
 
-En Android Studio → Device Manager, iniciar:
-1. Wear OS Large Round
-2. Pixel 5 API 33
+Para que los dos AVDs se vean entre sí por Bluetooth, deben lanzarse con el controlador virtual de Android Emulator:
+
+```bash
+# Lanzar wearable
+emulator -avd Wear_OS_Large_Round -packet-streamer-endpoint default -no-snapshot-load
+
+# Lanzar teléfono (misma API que el wearable para mejor compatibilidad)
+emulator -avd Medium_Phone_API_36.1 -packet-streamer-endpoint default -no-snapshot-load
+```
+
+> También puedes emparejarlos desde Android Studio: Device Manager → `Pair Wearable`.
 
 Verificar:
 ```bash
-flutter devices
+adb devices
 # Deben aparecer ambos emuladores
 ```
 
@@ -89,24 +98,32 @@ flutter devices
 ```bash
 cd practicas/p2.6/wearable_app
 flutter pub get
-flutter run -d emulator-5556
+flutter run -d <id_del_wearable>
 ```
 
-Presionar **INICIAR** en la pantalla del wearable para activar los sensores.
+Presionar **INICIAR** en la pantalla del wearable. Debe mostrar **Anunciando (visible)**, lo que indica que `ble_peripheral` ya publica el servicio y las 4 características NOTIFY.
 
 ### 3. Compilar y correr el teléfono
 
 ```bash
 cd practicas/p2.6/telefono_app
 flutter pub get
-flutter run -d emulator-5554
+flutter run -d <id_del_telefono>
 ```
 
-Presionar **BUSCAR WEARABLE** para escanear y conectar.
+Presionar **BUSCAR WEARABLE**. El teléfono escanea el serviceUUID, se conecta al wearable, descubre el servicio y activa NOTIFY en las 4 características.
 
 ---
 
 ## Capturas
+
+### Conexión BLE real entre emuladores
+
+<img src="captures/p2.6_both_devices.png" width="600" alt="Ambos emuladores conectados por BLE">
+
+Captura compuesta: **Wear OS** (izquierda) anuncia como periférico BLE con `ble_peripheral` y **Medium Phone API 36.1** (derecha) recibe los mismos datos como central BLE con `flutter_blue_plus`. El flujo `Wearable → Teléfono` funciona completamente en emuladores gracias al controlador virtual Netsim.
+
+---
 
 ### Wearable — Estado inicial (reposo)
 
@@ -152,13 +169,11 @@ Dashboard **real con BLE**: 4 tarjetas con estado **CAMINANDO**, 94 bpm, zona FC
 
 > ✅ **Conexión BLE real entre emuladores**: El wearable usa `ble_peripheral` para anunciarse como periférico GATT. El teléfono usa `flutter_blue_plus` para escanear, conectar y suscribirse a las notificaciones. El flujo completo `Wearable → Teléfono` funciona en los AVDs.
 
-### Teléfono — Alerta de ritmo cardiaco alto (vista previa)
+### Teléfono — Alerta de ritmo cardiaco alto
 
 <img src="captures/phone_alert.png" width="280" alt="Phone Alert">
 
-Alerta: banner rojo **Ritmo cardiaco alto: 142 bpm**, zona FC Alta.
-
-> Captura tomada con el **Modo Demo** para mostrar rápidamente la UI de alerta, pero el mismo componente `if (d.heartRate > 120)` en `MonitorScreen` se activa idénticamente cuando el wearable envía bpm > 120 vía BLE.
+Alerta: banner rojo **Ritmo cardiaco alto: 142 bpm**, zona FC Alta. El componente `if (d.heartRate > 120)` en `MonitorScreen` se activa tanto con datos BLE reales como con el Modo Demo.
 
 > **Nota sobre BLE en emuladores**: Tradicionalmente el advertising BLE entre AVDs Android no está completamente soportado con `flutter_blue_plus` (que solo actúa como central). Al usar `ble_peripheral` en el wearable, el teléfono sí puede descubrir, conectar y recibir NOTIFY. Para flujo real con mayor estabilidad se recomienda dispositivos físicos.
 
