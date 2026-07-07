@@ -4,6 +4,9 @@ import 'package:provider/provider.dart';
 import '../providers/weather_provider.dart';
 import '../providers/ble_provider.dart';
 import 'ble_screen.dart';
+import 'detail_screen.dart';
+import '../widgets/temperature_chart.dart';
+import '../models/forecast.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -21,7 +24,9 @@ class _HomeScreenState extends State<HomeScreen> {
     // Cargar ciudad por defecto al abrir
     Future.microtask(() {
       if (mounted) {
-        context.read<WeatherProvider>().fetchWeather('Queretaro');
+        final wp = context.read<WeatherProvider>();
+        wp.fetchWeather('Queretaro');
+        wp.fetchForecast('Queretaro');
       }
     });
   }
@@ -35,7 +40,9 @@ class _HomeScreenState extends State<HomeScreen> {
   void _search() {
     final city = _controller.text.trim();
     if (city.isNotEmpty) {
-      context.read<WeatherProvider>().fetchWeather(city);
+      final wp = context.read<WeatherProvider>();
+      wp.fetchWeather(city);
+      wp.fetchForecast(city);
       FocusScope.of(context).unfocus();
     }
   }
@@ -47,16 +54,36 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text('Climate App'),
         centerTitle: true,
         actions: [
+          // Toggle °C / °F
+          Consumer<WeatherProvider>(
+            builder: (context, wp, _) {
+              return IconButton(
+                icon: Text(
+                  wp.isFahrenheit ? '°F' : '°C',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                tooltip: 'Cambiar a ${wp.isFahrenheit ? 'Celsius' : 'Fahrenheit'}',
+                onPressed: wp.toggleUnit,
+              );
+            },
+          ),
           // Boton BLE heredado de P2.4
           Consumer<BLEProvider>(
             builder: (context, ble, _) {
+              final wp = context.read<WeatherProvider>();
+              final bleTemp = ble.bleTemperature != null
+                  ? wp.formatTemp(ble.bleTemperature!)
+                  : '?';
               return IconButton(
                 icon: Icon(
                   Icons.bluetooth,
                   color: ble.isConnected ? Colors.blue : null,
                 ),
                 tooltip: ble.isConnected
-                    ? 'BLE conectado (${ble.bleTemperature ?? "?"}°C)'
+                    ? 'BLE conectado ($bleTemp)'
                     : 'Buscar dispositivos BLE',
                 onPressed: () => Navigator.push(
                   context,
@@ -124,34 +151,82 @@ class _HomeScreenState extends State<HomeScreen> {
                 }
 
                 final w = wp.weather!;
+                final todayItems = _getTodayItems(wp.forecast);
                 return SingleChildScrollView(
-                  padding: const EdgeInsets.all(24),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                   child: Column(
                     children: [
                       Text(
                         w.city,
                         style: Theme.of(context).textTheme.headlineMedium,
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 4),
                       Text(
-                        '${w.temperature}°C',
+                        wp.formatTemp(w.temperature),
                         style: const TextStyle(
-                          fontSize: 72,
+                          fontSize: 64,
                           fontWeight: FontWeight.bold,
                           color: Colors.blue,
                         ),
                       ),
                       Text(
                         w.description,
-                        style: const TextStyle(fontSize: 20),
+                        style: const TextStyle(fontSize: 18),
                       ),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: 20),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           _stat('Humedad', '${w.humidity}%'),
                           _stat('Viento', '${w.windSpeed} m/s'),
                         ],
+                      ),
+                      const SizedBox(height: 24),
+                      if (todayItems.isNotEmpty) ...[
+                        const Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Temperatura por hora (hoy)',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Card(
+                          elevation: 2,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: TemperatureChart(
+                              items: todayItems,
+                              formatTemp: wp.formatTemp,
+                              isFahrenheit: wp.isFahrenheit,
+                            ),
+                          ),
+                        ),
+                      ] else if (wp.isLoadingForecast)
+                        const Padding(
+                          padding: EdgeInsets.all(20),
+                          child: Center(
+                            child: SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          ),
+                        ),
+                      const SizedBox(height: 24),
+                      ElevatedButton.icon(
+                        onPressed: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => DetailScreen(city: w.city),
+                          ),
+                        ),
+                        icon: const Icon(Icons.calendar_today),
+                        label: const Text('Ver pronóstico 5 días'),
                       ),
                     ],
                   ),
@@ -172,4 +247,14 @@ class _HomeScreenState extends State<HomeScreen> {
           style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
     ],
   );
+
+  List<ForecastItem> _getTodayItems(Forecast? forecast) {
+    if (forecast == null || forecast.items.isEmpty) return [];
+    final now = DateTime.now();
+    return forecast.items.where((item) {
+      return item.dateTime.day == now.day &&
+          item.dateTime.month == now.month &&
+          item.dateTime.year == now.year;
+    }).toList();
+  }
 }

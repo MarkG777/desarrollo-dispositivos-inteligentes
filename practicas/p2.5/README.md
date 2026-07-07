@@ -96,3 +96,19 @@ Por otro lado, el manejo de errores HTTP fue clave para que la app no crashee cu
 <img src="images/encuentra.jpeg" width="280" alt="Pantalla BLE encuentra dispositivos"/>
 
 > La capa BLE de P2.4 se mantiene integrada cuando la pantalla encuentra dispositivos
+
+---
+
+### Toggle de unidades °C / °F
+
+<img src="images/home_celsius.png" width="280" alt="Temperatura en Celsius"/> <img src="images/home_fahrenheit.png" width="280" alt="Temperatura en Fahrenheit"/>
+
+> Botón en el AppBar para alternar entre Celsius y Fahrenheit. La conversión se aplica en todas las pantallas: principal, BLE y pronóstico.
+
+---
+
+### Navegación – pronóstico de 5 días con datos reales
+
+<img src="images/forecast_days.png" width="280" alt="Pronóstico 5 días"/> <img src="images/forecast_hours.png" width="280" alt="Pronóstico por horas"/>
+
+> Desde la pantalla principal se navega al pronóstico de 5 días usando el endpoint `/forecast` de OpenWeatherMap. Cada día muestra temperatura mín/máx. Al tocar un día se expande una vista horizontal con la temperatura cada 3 horas. Las temperaturas respetan la unidad seleccionada (°C o °F).

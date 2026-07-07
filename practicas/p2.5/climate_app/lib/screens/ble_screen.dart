@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/ble_provider.dart';
+import '../providers/weather_provider.dart';
 
 class BleScreen extends StatelessWidget {
   const BleScreen({super.key});
@@ -13,8 +14,8 @@ class BleScreen extends StatelessWidget {
         title: const Text('Buscar dispositivos BLE'),
         centerTitle: true,
       ),
-      body: Consumer<BLEProvider>(
-        builder: (context, provider, _) {
+      body: Consumer2<BLEProvider, WeatherProvider>(
+        builder: (context, provider, wp, _) {
           if (provider.isScanning && provider.scanResults.isEmpty) {
             return const Center(child: CircularProgressIndicator());
           }
@@ -54,13 +55,29 @@ class BleScreen extends StatelessWidget {
           );
         },
       ),
-      floatingActionButton: Consumer<BLEProvider>(
-        builder: (context, provider, _) {
-          return FloatingActionButton(
-            onPressed: provider.isScanning ? null : provider.startScan,
-            child: provider.isScanning
-                ? const CircularProgressIndicator(color: Colors.white)
-                : const Icon(Icons.search),
+      floatingActionButton: Consumer2<BLEProvider, WeatherProvider>(
+        builder: (context, provider, wp, _) {
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              if (provider.isConnected && provider.bleTemperature != null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Text(
+                    'Temp BLE: ${wp.formatTemp(provider.bleTemperature!)}',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              FloatingActionButton(
+                onPressed: provider.isScanning ? null : provider.startScan,
+                child: provider.isScanning
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Icon(Icons.search),
+              ),
+            ],
           );
         },
       ),

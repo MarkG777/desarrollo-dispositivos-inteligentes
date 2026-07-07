@@ -42,6 +42,8 @@ practicas/p2.6/
 │   ├── phone_dashboard.png   # Dashboard real con datos BLE del wearable (caminando)
 │   ├── phone_alert.png       # Dashboard con alerta bpm > 120 (corriendo)
 │   └── phone_bueno_chido.png # Evidencia final de conexión BLE real con hora visible
+├── videos/                   # Evidencias en video
+│   └── probando.mp4          # Video final: apps corriendo y sincronizadas en emuladores
 ├── wearable_app/             # App Wear OS
 │   └── lib/
 │       ├── ble_constants.dart     # UUIDs de servicio y características
@@ -118,6 +120,14 @@ Presionar **BUSCAR WEARABLE**. El teléfono escanea el serviceUUID, se conecta a
 ---
 
 ## Capturas
+
+### Evidencia en video
+
+<video src="videos/probando.mp4" width="320" controls></video>
+
+Video final mostrando ambas apps corriendo simultáneamente: el wearable anuncia por BLE (`ble_peripheral`) y el teléfono recibe los datos en tiempo real (`flutter_blue_plus` + Netsim). Se puede observar que el dashboard del teléfono se actualiza con los mismos valores del wearable.
+
+---
 
 ### Conexión BLE real entre emuladores
 
